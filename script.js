@@ -1,3 +1,6 @@
+import './styles.css'
+import './boards.css'
+
 document.addEventListener('DOMContentLoaded', function() {
     const boardsContainer = document.querySelector('.boards-container');
     const controlsContainer = document.querySelector('.controls');

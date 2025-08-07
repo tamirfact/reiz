@@ -3,10 +3,17 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   root: '.',
   publicDir: 'public',
-  base: '/reiz/', // This should match your repository name
+  base: './', // Changed from '/reiz/' to './' for relative paths
   build: {
-    outDir: 'dist', // Changed from 'public' to 'dist' for GitHub Pages
+    outDir: 'dist',
     assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js'
+      }
+    }
   },
   server: {
     port: 3000,
