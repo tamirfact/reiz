@@ -7,12 +7,18 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && git add dist && git commit -m 'Deploy to GitHub Pages' && git push"
+    "deploy": "npm run build && git add dist && git commit -m 'Deploy to GitHub Pages' && git push",
+    "vercel-dev": "npm run build && vercel dev",
+    "start": "vite preview --port 3000"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@vercel/blob": "^0.22.0",
+    "etag": "^1.8.1"
   }
 }

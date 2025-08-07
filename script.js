@@ -1,12 +1,86 @@
 import './styles.css'
 import './boards.css'
 
+
+
 document.addEventListener('DOMContentLoaded', function() {
     const boardsContainer = document.querySelector('.boards-container');
     const controlsContainer = document.querySelector('.controls');
     const baseWidth = 800;
     // Track the current mode (0: standard, 1: narrow, 2: wide)
     let boardMode = 0; // Default to standard mode
+    
+    // Session management and logging
+    let sessionId = null;
+    let isLogging = false;
+    
+    // Generate a unique session ID
+    function generateSessionId() {
+        return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    // Get current state code (6 letters for board order + 6 digits for states)
+    function getCurrentStateCode() {
+        const controlOrder = Array.from(controlsContainer.children).map(
+            control => parseInt(control.dataset.boardIndex)
+        );
+        
+        // Get the letters and states in current visual order
+        const orderCode = controlOrder.map(boardIndex => {
+            const board = boards[boardIndex];
+            return board.letter;
+        }).join('');
+        
+        const stateCode = controlOrder.map(boardIndex => {
+            const board = boards[boardIndex];
+            return board.colorState.toString();
+        }).join('');
+        
+        // Combine order and state: ABCDEF + 012012
+        return orderCode + stateCode;
+    }
+    
+    // Log session state to backend
+    async function logSessionState() {
+        if (isLogging || !sessionId) return;
+        
+        isLogging = true;
+        try {
+            const stateCode = getCurrentStateCode();
+            const timestamp = Date.now();
+            
+            console.log('Sending session state:', { sessionId, stateCode, timestamp });
+            
+            const response = await fetch('/api/log-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionId,
+                    stateCode,
+                    timestamp
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Failed to log session state:', errorData);
+            } else {
+                console.log('Session state logged successfully');
+            }
+        } catch (error) {
+            console.error('Error logging session state:', error);
+        } finally {
+            isLogging = false;
+        }
+    }
+    
+    // Initialize session
+    function initializeSession() {
+        sessionId = generateSessionId();
+        console.log('Session initialized:', sessionId);
+    }
     
     // Animation timing constants
     const BOARD_ANIMATION_DURATION = 0.1; // Duration for board animations in seconds
@@ -33,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Define board colors and shapes based on the Objective-C code
     const boardConfigs = [
         { 
+            letter: 'A',
             shape: 'stripes', 
             colors: { 
                 primary: '#FFE100',   // Yellow
@@ -41,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } 
         },
         { 
+            letter: 'B',
             shape: 'split-circle', 
             colors: { 
                 primary: '#F4511E',   // Deep Orange
@@ -49,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } 
         },
         { 
+            letter: 'C',
             shape: 'capsule', 
             colors: { 
                 primary: '#FF6F00',   // Amber
@@ -57,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } 
         },
         { 
+            letter: 'D',
             shape: 'square', 
             colors: { 
                 primary: '#E53935',   // Red
@@ -65,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } 
         },
         { 
+            letter: 'E',
             shape: 'frame-dot', 
             colors: { 
                 primary: '#4CAF50',   // Green
@@ -73,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } 
         },
         { 
+            letter: 'F',
             shape: 'diamonds', 
             colors: { 
                 primary: '#1565C0',   // Blue
@@ -735,6 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
             container: boardContainer,
             canvas: canvas,
             config: config,
+            letter: config.letter,
             colorState: initialState // Set initial state
         });
         
@@ -799,6 +880,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update download button color after the state change
             updateDownloadButtonColor();
+            
+            // Log session state change
+            logSessionState();
         });
         
         controlsContainer.appendChild(controlBtn);
@@ -810,6 +894,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         initializeSortable();
     }
+    
+    // Initialize session
+    initializeSession();
     
     // Initial creation of boards
     initializeBoards();
@@ -958,6 +1045,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update download button color to match the top board
         updateDownloadButtonColor();
+        
+        // Log session state change
+        logSessionState();
     }
     
     // Function to update download button color based on top board
