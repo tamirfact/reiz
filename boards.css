@@ -1,0 +1,783 @@
+/* TODO: init animation for the boards to float in from the bottom */
+/* icons twist animations */
+
+.calendar-container {
+    flex: 1;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: flex-start;
+    perspective: 1000px;
+    gap: 24px;
+}
+
+@media (max-width: 700px) {
+    .calendar-container {
+        flex-direction: column-reverse;
+        align-items: center;
+        gap: 12px;
+    }
+    .calendar-container .calendar {
+    }
+}
+
+.calendar {
+    background-color: #2E2E2E;
+    border-radius: var(--cal-radius);
+    width: calc(var(--cal-size) + 40px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transform-style: preserve-3d;
+    /* transition: transform 0.5s ease-out, width 0.3s ease-out; */
+}
+
+
+/* Narrow board mode */
+body.narrow-mode .calendar {
+    width: calc((var(--cal-size) / 2) + 40px);
+}
+
+/* Wide board mode */
+body.wide-mode .calendar {
+    width: calc((var(--cal-size) * 2) + 40px);
+}
+
+.top-hole {
+    display: none;
+    width: calc(var(--cal-size) * 0.45);
+    height: 2%;
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-background);
+    border-radius: 12px;
+    z-index: 100;
+}
+
+.top-square {
+    width: calc(var(--cal-size) * 0.42);
+    height: 2%;
+    position: absolute;
+    top: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+     transition: none;
+    background-color: #000;
+    border-radius: 3px 3px 0 0;
+    z-index: 101;
+}
+/* 
+
+@media (max-width: 700px) {
+    .top-square {
+     
+        height: 8px;
+        top:28px;
+    }
+    .top-hole {
+
+        height: 8px;
+        top: 32px;
+    }
+} */
+
+.boards-container {
+    width: var(--cal-size);
+    height: var(--cal-size);
+    position: relative;
+    margin-bottom: 16px;
+    transform-style: preserve-3d;
+    transition: opacity 0.1s ease, width 0.3s ease-out;
+}
+
+/* Narrow board mode */
+body.narrow-mode .boards-container {
+    width: calc(var(--cal-size) / 2);
+
+}
+
+/* Wide board mode */
+body.wide-mode .boards-container {
+    width: calc(var(--cal-size) * 2);
+}
+/* 
+.board-container:nth-child(1) {
+    --delay: 0s;
+}
+.board-container:nth-child(2) {
+    --delay: 0.2s;
+}
+.board-container:nth-child(3) {
+    --delay: 0.4s;
+}
+.board-container:nth-child(4) {
+    --delay: 0.6s;
+}
+.board-container:nth-child(5) {
+    --delay: 0.8s;
+} */
+
+
+.board-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.initial-state .board-container{
+    opacity: 0;
+    transform: translateY(-25%) scale(.5);
+}
+
+.initial-state .top-hole, .initial-state .top-square {
+    opacity: 0;
+}
+
+.board-container.animate-in {
+    animation: fly-in 0.5s forwards ease-in-out;
+}
+
+@keyframes fly-in {
+    0% {
+        transform: translateY(-75%) scale(.4);
+        opacity: 0;
+    }
+    25% {
+        transform: translateY(-75%) scale(.7);
+        opacity: 1;
+
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.board-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.control-btn {
+    width: var(--ctrl-button-size);
+    height: 40px;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    border: none;
+    margin: 5px 0;
+    user-select: none;
+    transition: transform 0.2s ease, opacity 0.3s ease, border 0.3s ease, box-shadow 0.3s ease, width 0.3s ease;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+/* Control button size classes */
+.control-btn.narrow {
+    width: 20px;
+}
+
+.control-btn.regular {
+    width: 40px;
+}
+
+.control-btn.wide {
+    width: 80px;
+}
+
+/* Drag indicator arrow using Material Icons */
+.control-btn:hover::before {
+    content: "unfold_more";
+    font-family: 'Material Icons';
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    animation: fade-in 0.3s forwards;
+    color: var(--color-text-primary);
+    pointer-events: none; /* Ensure it doesn't interfere with clicking */
+}
+
+@media (max-width: 700px) {
+    .control-btn:hover::before {
+        content: "";
+    
+    }
+}
+/* Don't show indicator when the controls container is in dragging state */
+.controls.is-dragging .control-btn:hover::before {
+    display: none;
+}
+
+/* Adjust arrow color based on theme */
+body.light-mode .control-btn:hover:not(.shiver-1):not(.shiver-2):not(.shiver-3):not(.shiver-4):not(.shiver-5):not(.shiver-6):not(.sortable-chosen):not(.sortable-drag)::before {
+    color: rgba(100, 100, 100, 0.7); /* Darker gray for light theme */
+}
+
+/* Fade-in animation for the indicator */
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-50%) translateX(10px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+/* Original hover effect - for both desktop and mobile */
+.control-btn:hover:not(.shiver-1):not(.shiver-2):not(.shiver-3):not(.shiver-4):not(.shiver-5):not(.shiver-6):not(.sortable-chosen):not(.sortable-drag) {
+    transform: scale(1.01);
+}
+
+/* Desktop hover effect with border and glow */
+@media (min-width: 701px) and (min-height: 551px) {
+    .control-btn:hover:not(.sortable-chosen):not(.sortable-drag):not(.sortable-ghost) {
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* Make sure active state has higher precedence than hover */
+.control-btn:active {
+    transform: scale(0.98) !important;
+    animation: none !important; /* Stop shivering when clicked */
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Fix potential animation conflicts with clicked and swapped classes */
+.control-btn.clicked,
+.control-btn.swapped {
+    animation: click-effect 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; /* Override shiver animation */
+}
+
+.control-btn.swapped {
+    animation: swap-effect 0.5s ease !important; /* Override shiver animation */
+}
+
+.control-btn.dragging {
+    opacity: 0.7;
+    transform: scale(1.01);
+}
+
+.control-btn canvas {
+    width: 100%;
+    height: 100%;
+    /* transition: all 0.2s ease; */
+    pointer-events: none;
+    transition: filter 0.3s ease;
+}
+
+/* Desktop hover effect for canvas brightness */
+@media (min-width: 701px) and (min-height: 551px) {
+    .control-btn:hover:not(.sortable-chosen):not(.sortable-drag):not(.sortable-ghost) canvas {
+        filter: brightness(1.15);
+    }
+    
+    /* Specific adjustment for inactive buttons */
+    .control-btn.inactive:hover canvas {
+        filter: brightness(1.1); /* Slightly less brightness increase for inactive buttons */
+    }
+}
+
+.control-btn.drag-over {
+    transform: scale(1.01);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.calendar-footer {
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    font-weight: bold;
+    font-size: 2rem;
+    gap: 12px;
+    transition: opacity 0.15s ease-in-out, flex-direction 0.3s ease-out;
+    transform-style: preserve-3d;
+}
+
+.calendar-footer div {
+    background-color: #000;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-footer div:active {
+    cursor: grabbing;
+}
+
+/* Dragging styles for date labels */
+.calendar-footer div.sortable-ghost {
+    opacity: 0.0;
+    background-color: #333;
+}
+
+.calendar-footer div.sortable-chosen {
+    /* transform: rotate(15deg); */
+    /* box-shadow: 0 5px 15px rgba(0,0,0,0.3); */
+    z-index: 1000;
+}
+
+
+/* Narrow board mode - stack date labels vertically */
+body.narrow-mode .calendar-footer {
+    flex-direction: column;
+    gap: 4px;
+}
+
+body.narrow-mode .day-label,
+body.narrow-mode .month-label,
+body.narrow-mode .date-label {
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.day-label, .month-label, .date-label {
+    padding: 16px 0px;
+    text-align: center;
+    flex: 1;
+    font-size: var(--font-size-cal);
+    position: relative;
+    width: auto;
+    display: flex;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+}
+
+.day-label::before, .month-label::before, .date-label::before {
+    content: '';
+    display: block;
+    width: 50%;
+    height: 5px;
+    border-radius: 4px;
+    background-color: #212121;
+    position: absolute;
+    top: 4px; 
+    left: 50%;
+    transform: translateX(-50%);
+}
+body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body.narrow-mode .date-label::before {
+    display: none;
+}
+
+.controls-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap);
+    z-index: 100;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ctrl-button-gap);
+    position: relative;
+}
+
+/* Create a hover detection area around controls */
+.controls::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    bottom: -20px;
+    left: -20px;
+    z-index: -1;
+}
+
+
+/* Add these to the existing CSS */
+.control-btn.clicked {
+    animation: click-effect 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.control-btn.swapped {
+    animation: swap-effect 0.5s ease;
+}
+
+/* Shiver animation classes */
+.control-btn.shiver-1 {
+    animation: shiver-1 0.8s infinite;
+}
+
+.control-btn.shiver-2 {
+    animation: shiver-2 0.7s infinite;
+}
+
+.control-btn.shiver-3 {
+    animation: shiver-3 0.9s infinite;
+}
+
+.control-btn.shiver-4 {
+    animation: shiver-4 0.85s infinite;
+}
+
+.control-btn.shiver-5 {
+    animation: shiver-5 0.75s infinite;
+}
+
+.control-btn.shiver-6 {
+    animation: shiver-6 0.65s infinite;
+}
+
+/* Six different subtle shiver animations */
+@keyframes shiver-1 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(calc(var(--shiver-intensity) * 1px), calc(var(--shiver-intensity) * -0.5px)) rotate(calc(var(--shiver-intensity) * 0.3deg)); }
+    50% { transform: translate(0, 0) rotate(0deg); }
+    75% { transform: translate(calc(var(--shiver-intensity) * -0.7px), calc(var(--shiver-intensity) * 0.8px)) rotate(calc(var(--shiver-intensity) * -0.5deg)); }
+}
+
+@keyframes shiver-2 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(calc(var(--shiver-intensity) * -0.8px), calc(var(--shiver-intensity) * -0.3px)) rotate(calc(var(--shiver-intensity) * -0.4deg)); }
+    40% { transform: translate(calc(var(--shiver-intensity) * 0.4px), calc(var(--shiver-intensity) * 0.6px)) rotate(calc(var(--shiver-intensity) * 0.2deg)); }
+    60% { transform: translate(calc(var(--shiver-intensity) * -0.2px), calc(var(--shiver-intensity) * -0.4px)) rotate(calc(var(--shiver-intensity) * -0.3deg)); }
+    80% { transform: translate(calc(var(--shiver-intensity) * 0.6px), calc(var(--shiver-intensity) * 0.2px)) rotate(calc(var(--shiver-intensity) * 0.5deg)); }
+}
+
+@keyframes shiver-3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(calc(var(--shiver-intensity) * 0.6px), calc(var(--shiver-intensity) * -0.8px)) rotate(calc(var(--shiver-intensity) * 0.4deg)); }
+    66% { transform: translate(calc(var(--shiver-intensity) * -0.5px), calc(var(--shiver-intensity) * 0.5px)) rotate(calc(var(--shiver-intensity) * -0.3deg)); }
+}
+
+@keyframes shiver-4 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(calc(var(--shiver-intensity) * 0.4px), calc(var(--shiver-intensity) * 0.7px)) rotate(calc(var(--shiver-intensity) * 0.15deg)); }
+    50% { transform: translate(calc(var(--shiver-intensity) * -0.3px), calc(var(--shiver-intensity) * -0.2px)) rotate(calc(var(--shiver-intensity) * -0.25deg)); }
+    75% { transform: translate(calc(var(--shiver-intensity) * 0.5px), calc(var(--shiver-intensity) * -0.3px)) rotate(calc(var(--shiver-intensity) * 0.3deg)); }
+}
+
+@keyframes shiver-5 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(calc(var(--shiver-intensity) * 0.2px), calc(var(--shiver-intensity) * -0.5px)) rotate(calc(var(--shiver-intensity) * 0.1deg)); }
+    40% { transform: translate(calc(var(--shiver-intensity) * -0.7px), calc(var(--shiver-intensity) * 0.3px)) rotate(calc(var(--shiver-intensity) * -0.2deg)); }
+    60% { transform: translate(calc(var(--shiver-intensity) * 0.5px), calc(var(--shiver-intensity) * 0.4px)) rotate(calc(var(--shiver-intensity) * 0.15deg)); }
+    80% { transform: translate(calc(var(--shiver-intensity) * -0.3px), calc(var(--shiver-intensity) * -0.6px)) rotate(calc(var(--shiver-intensity) * -0.25deg)); }
+}
+
+@keyframes shiver-6 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    16% { transform: translate(calc(var(--shiver-intensity) * 0.3px), calc(var(--shiver-intensity) * 0.2px)) rotate(calc(var(--shiver-intensity) * 0.25deg)); }
+    33% { transform: translate(calc(var(--shiver-intensity) * -0.5px), calc(var(--shiver-intensity) * -0.3px)) rotate(calc(var(--shiver-intensity) * -0.15deg)); }
+    50% { transform: translate(calc(var(--shiver-intensity) * 0.2px), calc(var(--shiver-intensity) * 0.4px)) rotate(calc(var(--shiver-intensity) * 0.1deg)); }
+    66% { transform: translate(calc(var(--shiver-intensity) * -0.4px), calc(var(--shiver-intensity) * 0.3px)) rotate(calc(var(--shiver-intensity) * -0.2deg)); }
+    83% { transform: translate(calc(var(--shiver-intensity) * 0.5px), calc(var(--shiver-intensity) * -0.4px)) rotate(calc(var(--shiver-intensity) * 0.3deg)); }
+}
+
+@keyframes click-effect {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.99); }
+    100% { transform: scale(1); }
+}
+
+@keyframes swap-effect {
+    0% { transform: scale(1); opacity: 1; }
+    25% { transform: scale(1.02); opacity: 0.8; }
+    50% { transform: scale(0.98); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Add these styles for SortableJS */
+.control-btn.sortable-ghost, .control-btn:not(.inactive).sortable-ghost, .control-btn.inactive.sortable-ghost {
+    opacity: 0;
+}
+
+.control-btn.sortable-chosen {
+    transform: scale(1.06) !important;
+    /* border: 1px solid #fff; */
+    animation: none !important; /* Stop shivering when chosen */
+}
+
+.control-btn.sortable-drag {
+    opacity: 0;
+    animation: none !important; /* Stop shivering when dragged */
+}
+
+/* Animation classes for 3D effect */
+.calendar.dragging {
+    transform: rotateX(25deg);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.board-container.dragging {
+    transition: transform 0.3s ease-out;
+}
+
+/* Add shadow for better 3D effect */
+.board-container.dragging::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    opacity: 0.5;
+    pointer-events: none;
+    border-radius: 5px;
+}
+
+/* Add a subtle glow effect to the active board during drag */
+.board-container.active-drag {
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
+
+/* Add this to your CSS file */
+.control-btn.inactive {
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+/* Visibility icon for inactive buttons */
+.control-btn.inactive::after {
+    content: "visibility_off";
+    font-family: 'Material Icons';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    z-index: 10;
+    opacity: 1;
+    pointer-events: none;
+    transition: none;
+
+}
+.light-mode .control-btn.inactive::after {
+    color: #000;
+}
+.control-btn:not(.inactive) {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* When dragging, increase shiver intensity for other control buttons */
+.controls.is-dragging .control-btn:not(.sortable-chosen):not(.sortable-drag):not(.sortable-ghost) {
+    --shiver-intensity: 2; /* Increase intensity during drag */
+}
+
+/* Override hover animation when dragging */
+.controls.is-dragging .control-btn:hover {
+    transform: none;
+}
+
+/* Hide boards and footer when calendar is showing its back side */
+.calendar.showing-back .boards-container,
+.calendar.showing-back .calendar-footer {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.1s ease-out, visibility 0s 0.1s !important;
+}
+
+/* Ensure they're visible when not showing back */
+.calendar:not(.showing-back) .boards-container,
+.calendar:not(.showing-back) .calendar-footer {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: opacity 0.1s ease-in !important;
+}
+
+/* Media query for mobile in narrow mode needs adjustments */
+@media (max-width: 700px) {
+    body.narrow-mode .calendar {
+        width: calc((var(--cal-size) / 2) + 20px);
+        padding: 10px;
+    }
+    
+    body.narrow-mode .calendar-footer {
+        gap: 1px;
+    }
+    
+    body.narrow-mode .day-label,
+    body.narrow-mode .month-label,
+    body.narrow-mode .date-label {
+        padding: 0px 6px;
+        font-size: 10px;
+   }
+    
+    .control-btn:hover:not(.shiver-1):not(.shiver-2):not(.shiver-3):not(.shiver-4):not(.shiver-5):not(.shiver-6):not(.sortable-chosen):not(.sortable-drag)::before {
+        left: -20px;
+        font-size: 16px;
+        transform: translateY(-50%) rotate(90deg);
+    }
+    
+    /* Adjust animation for mobile */
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(-50%) translateX(5px) rotate(90deg); }
+        to { opacity: 1; transform: translateY(-50%) translateX(0) rotate(90deg); }
+    }
+}
+
+/* Responsive design */
+@media (max-width: 700px) {
+
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .calendar {
+        max-width: 100%;
+    }
+    
+    .controls-section {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .refresh-container {
+        order: 1;
+        margin-top: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .controls {
+        order: 2;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .refresh-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .refresh-btn .material-icons {
+        font-size: 18px;
+    }
+    
+    .controls::before {
+        top: -15px;
+        right: -15px;
+        bottom: -15px;
+        left: -15px;
+    }
+    .controls::before {
+        top: -15px;
+        right: -15px;
+        bottom: -15px;
+        left: -15px;
+    }
+    
+    * {
+        --shiver-intensity: 0.75; /* Reduce intensity on smaller screens */
+    }
+    .calendar {
+        transform-style: flat !important;
+        backface-visibility: visible !important;
+        will-change: transform, opacity;
+        width: calc(var(--cal-size) + 20px);
+        padding: 10px;
+    }
+    
+    .calendar.showing-back .boards-container,
+    .calendar.showing-back .calendar-footer {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transition: opacity 0.1s linear, visibility 0s 0.1s !important;
+    }
+    
+    .calendar:not(.showing-back) .boards-container,
+    .calendar:not(.showing-back) .calendar-footer {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transition: opacity 0.1s linear !important;
+    }
+
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .calendar {
+        max-width: 100%;
+    }
+    
+    .controls-section {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .refresh-container {
+        order: 1;
+        margin-top: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .controls {
+        order: 2;
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .refresh-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .refresh-btn .material-icons {
+        font-size: 18px;
+    }
+
+}
+
+/* Add animations for the three toggle states */
+@keyframes resize-toggle-to-narrow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(90deg); }
+}
+
+@keyframes resize-toggle-to-wide {
+    0% { transform: rotate(90deg); }
+    100% { transform: rotate(180deg); }
+}
+
+@keyframes resize-toggle-to-standard {
+    0% { transform: rotate(180deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Media query adjustments for wide mode */
+@media (max-width: 700px) {
+    body.wide-mode .calendar {
+        width: calc((var(--cal-size) * 2) + 20px);
+        padding: 10px;
+    }
+    
+    body.wide-mode .boards-container {
+        width: calc(var(--cal-size) * 2);
+    }
+    
+    /* existing code */
+}
+
+/* Animation for date labels settling after drag */
+@keyframes date-label-settle {
+    0% { transform: scale(1.02); }
+    100% { transform:  scale(1); }
+}
+
