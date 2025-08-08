@@ -16,17 +16,17 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const { sessionId, stateCode, timestamp } = req.body;
+      try {
+        const { sessionId, stateCode, timestamp, boardMode } = req.body;
 
-    console.log('Received request:', { sessionId, stateCode, timestamp });
+        console.log('Received request:', { sessionId, stateCode, timestamp, boardMode });
 
-    if (!sessionId || !stateCode || !timestamp) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        received: { sessionId: !!sessionId, stateCode: !!stateCode, timestamp: !!timestamp }
-      });
-    }
+        if (!sessionId || !stateCode || !timestamp) {
+            return res.status(400).json({ 
+                error: 'Missing required fields',
+                received: { sessionId: !!sessionId, stateCode: !!stateCode, timestamp: !!timestamp }
+            });
+        }
 
     // Updated validation for 6 boards: 6 letters followed by 6 digits
     if (!/^[A-Z]{6}[012]{6}$/.test(stateCode)) {
@@ -37,12 +37,13 @@ export default async function handler(req, res) {
       });
     }
 
-    // Save session data to blob storage
+        // Save session data to blob storage
     const sessionData = {
-      sessionId,
-      stateCode,
-      timestamp: new Date(timestamp).toISOString(),
-      updatedAt: new Date().toISOString()
+        sessionId,
+        stateCode,
+        timestamp: new Date(timestamp).toISOString(),
+        boardMode: boardMode || 0,
+        updatedAt: new Date().toISOString()
     };
 
     const { url } = await put(`sessions/${sessionId}.json`, JSON.stringify(sessionData), { 

@@ -771,6 +771,16 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
     body.wide-mode .boards-container {
         width: calc(var(--cal-size) * 2);
     }
+
+    .control-btn.sortable-ghost {
+        opacity: 1;
+    }
+    .control-btn:not(.inactive).sortable-ghost {
+        opacity: 1;
+    }
+    .control-btn.inactive.sortable-ghost {
+        opacity: 0.2;
+    }
     
     /* existing code */
 }

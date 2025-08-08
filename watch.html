@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Watcher - Reisinger's Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .calendar-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .session-info {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .calendar {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            background: #212121;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .boards-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+        }
+        
+        .board {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1000;
+        }
+        
+        .refresh-btn:hover {
+            background: #555;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Session Watcher</h1>
+        <p>Last 5 sessions from blob storage</p>
+    </div>
+    
+    <button class="refresh-btn" onclick="loadSessions()">
+        <span class="material-icons">refresh</span>
+    </button>
+    
+    <div class="status" id="status">Loading sessions...</div>
+    
+    <div class="grid" id="grid">
+        <!-- Calendars will be inserted here -->
+    </div>
+
+    <script type="module">
+        import './styles.css';
+        import './boards.css';
+        import { drawShape } from './shapes.js';
+        
+        // Define the missing variables that shapes.js needs (make them global)
+        window.isNarrowMode = false;
+        window.isWideMode = false;
+        
+        let sessions = [];
+        let boardConfigs = [
+            { 
+                letter: 'A',
+                shape: 'stripes', 
+                colors: { 
+                    primary: '#FFE100',   // Yellow
+                    secondary: '#5E35B1',  // Deep Purple
+                    off: '#666666'        // Gray for off state
+                } 
+            },
+            { 
+                letter: 'B',
+                shape: 'split-circle', 
+                colors: { 
+                    primary: '#F4511E',   // Deep Orange
+                    secondary: '#7CB342',  // Light Green
+                    off: '#666666'        // Gray for off state
+                } 
+            },
+            { 
+                letter: 'C',
+                shape: 'capsule', 
+                colors: { 
+                    primary: '#FF6F00',   // Amber
+                    secondary: '#3949AB',  // Indigo
+                    off: '#666666'        // Gray for off state
+                } 
+            },
+            { 
+                letter: 'D',
+                shape: 'square', 
+                colors: { 
+                    primary: '#E53935',   // Red
+                    secondary: '#0097A7',  // Cyan
+                    off: '#666666'        // Gray for off state
+                } 
+            },
+            { 
+                letter: 'E',
+                shape: 'frame-dot', 
+                colors: { 
+                    primary: '#4CAF50',   // Green
+                    secondary: '#D81B60',  // Pink
+                    off: '#666666'        // Gray for off state
+                } 
+            },
+            { 
+                letter: 'F',
+                shape: 'diamonds', 
+                colors: { 
+                    primary: '#1565C0',   // Blue
+                    secondary: '#00897B',  // Teal
+                    off: '#666666'        // Gray for off state
+                } 
+            }
+        ];
+        
+        // Function to create a calendar from session data
+        function createCalendar(session, index) {
+            const container = document.createElement('div');
+            container.className = 'calendar-container';
+            
+            const sessionInfo = document.createElement('div');
+            sessionInfo.className = 'session-info';
+            sessionInfo.textContent = `Session ${index + 1}`;
+            container.appendChild(sessionInfo);
+            
+            // Set the board mode for this session
+            window.isNarrowMode = session.boardMode === 1;
+            window.isWideMode = session.boardMode === 2;
+            
+            const calendar = document.createElement('div');
+            calendar.className = 'calendar';
+            
+            const boardsContainer = document.createElement('div');
+            boardsContainer.className = 'boards-container';
+            
+            // Parse the state code
+            const orderCode = session.stateCode.substring(0, 6);
+            const stateCode = session.stateCode.substring(6, 12);
+            
+            // Create boards in the correct order
+            const boards = [];
+            for (let i = 0; i < 6; i++) {
+                const letter = orderCode[i];
+                const state = parseInt(stateCode[i]);
+                
+                // Find the board config by letter
+                const config = boardConfigs.find(c => c.letter === letter);
+                if (!config) continue;
+                
+                // Create board container
+                const board = document.createElement('div');
+                board.className = 'board';
+                board.style.zIndex = 5 - i; // Higher index = higher z-index
+                
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = 400;
+                canvas.height = 400;
+                
+                // Determine color based on state
+                let color;
+                if (state === 0) {
+                    color = config.colors.primary;
+                    board.style.display = 'block';
+                } else if (state === 1) {
+                    color = config.colors.secondary;
+                    board.style.display = 'block';
+                } else {
+                    color = config.colors.off;
+                    board.style.display = 'none';
+                }
+                
+                // Draw shape using the original shapes.js function
+                drawShape(canvas, config.shape, color);
+                board.appendChild(canvas);
+                boardsContainer.appendChild(board);
+                boards.push({ board, config, state });
+            }
+            
+            calendar.appendChild(boardsContainer);
+            container.appendChild(calendar);
+            
+            return container;
+        }
+        
+        // Function to load sessions from blob storage
+        async function loadSessions() {
+            try {
+                document.getElementById('status').textContent = 'Loading sessions...';
+                
+                // Get sessions from the API
+                const response = await fetch('/api/get-sessions');
+                const data = await response.json();
+                
+                if (data.success) {
+                    sessions = data.sessions;
+                } else {
+                    console.error('Failed to load sessions:', data.error);
+                    sessions = [];
+                }
+                
+                // Clear and populate grid
+                const grid = document.getElementById('grid');
+                grid.innerHTML = '';
+                
+                sessions.forEach((session, index) => {
+                    const calendar = createCalendar(session, index);
+                    grid.appendChild(calendar);
+                });
+                
+                document.getElementById('status').textContent = `Loaded ${sessions.length} sessions - Last updated: ${new Date().toLocaleTimeString()}`;
+                
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                document.getElementById('status').textContent = 'Error loading sessions';
+            }
+        }
+        
+        // Load sessions immediately and then every 10 seconds
+        loadSessions();
+        setInterval(loadSessions, 10000);
+        
+        // Make loadSessions available globally for the refresh button
+        window.loadSessions = loadSessions;
+    </script>
+</body>
+</html> 

@@ -1,7 +1,7 @@
 import './styles.css'
 import './boards.css'
 
-
+const logSession = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     const boardsContainer = document.querySelector('.boards-container');
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return orderCode + stateCode;
     }
     
+    updateShiverAnimations();
     // Log session state to backend
     async function logSessionState() {
         if (isLogging || !sessionId) return;
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const stateCode = getCurrentStateCode();
             const timestamp = Date.now();
             
-            console.log('Sending session state:', { sessionId, stateCode, timestamp });
+            console.log('Sending session state:', { sessionId, stateCode, timestamp, boardMode });
             
             const response = await fetch('/api/log-session', {
                 method: 'POST',
@@ -59,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     sessionId,
                     stateCode,
-                    timestamp
+                    timestamp,
+                    boardMode
                 })
             });
             
@@ -882,7 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDownloadButtonColor();
             
             // Log session state change
-            logSessionState();
+           if (logSession) logSessionState();
         });
         
         controlsContainer.appendChild(controlBtn);
@@ -930,16 +932,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const controlBtns = controlsContainer.querySelectorAll('.control-btn');
         
         controlBtns.forEach(btn => {
-            if (isDragging) {
+            if (isMobileDevice()) {
+                // On mobile, always apply shiver animation
+                btn.classList.add(btn.dataset.shiverClass);
+            } else  if (isDragging) {
                 // During drag, don't apply shiver to the dragged button
                 if (!btn.classList.contains('sortable-chosen') && !btn.classList.contains('sortable-drag')) {
                     btn.classList.add(btn.dataset.shiverClass);
                 }
             } else if (isHoveringControls) {
-                // Apply shiver animation when hovering
+                // On desktop, apply shiver animation when hovering
                 btn.classList.add(btn.dataset.shiverClass);
             } else {
-                // Remove all shiver animations when not hovering
+                // Remove all shiver animations when not hovering (desktop only)
                 for (let i = 1; i <= 6; i++) {
                     btn.classList.remove(`shiver-${i}`);
                 }
@@ -1047,7 +1052,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateDownloadButtonColor();
         
         // Log session state change
-        logSessionState();
+        if (logSession) logSessionState();
     }
     
     // Function to update download button color based on top board
