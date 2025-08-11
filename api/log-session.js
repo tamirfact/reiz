@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       });
     }
 
-        // Save session data to blob storage
+            // Save session data to blob storage
     const sessionData = {
         sessionId,
         stateCode,
@@ -46,10 +46,14 @@ export default async function handler(req, res) {
         updatedAt: new Date().toISOString()
     };
 
+    console.log('Saving session to blob storage:', sessionId);
+    
     const { url } = await put(`sessions/${sessionId}.json`, JSON.stringify(sessionData), { 
-      access: 'public',
-      addRandomSuffix: false
+        access: 'public',
+        addRandomSuffix: false
     });
+
+    console.log('Session saved successfully:', url);
 
     // Get all session files from blob storage
     const { blobs } = await list({ prefix: 'sessions/' });

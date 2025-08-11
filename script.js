@@ -1,7 +1,7 @@
 import './styles.css'
 import './boards.css'
 
-const logSession = false;
+const logSession = true;
 
 document.addEventListener('DOMContentLoaded', function() {
     const boardsContainer = document.querySelector('.boards-container');
@@ -828,6 +828,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add inactive class if in off state
         if (initialState === 2) {
             controlBtn.classList.add('inactive');
+        }
+        
+        // Apply current board mode sizing classes
+        if (boardMode === 1) {
+            controlBtn.classList.add('narrow');
+        } else if (boardMode === 2) {
+            controlBtn.classList.add('wide');
+        } else {
+            controlBtn.classList.add('regular');
         }
             
             // Assign a random shiver animation class (1-6)

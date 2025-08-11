@@ -27,59 +27,38 @@
         }
         
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
+            display: flex;
+            /* grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); */
+            /* gap: 30px; */
+            /* max-width: 1400px; */
+            /* margin: 0 auto; */
         }
         
         .calendar-container {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            position: relative;
         }
         
         .session-info {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            z-index: 1000;
+           display: none;
         }
         
         .calendar {
             position: relative;
-            width: 400px;
-            height: 400px;
+            aspect-ratio: 1/1;
             margin: 0 auto;
             background: #212121;
             border-radius: 10px;
             overflow: hidden;
+            zoom: .5;
         }
         
-        .boards-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 400px;
-            height: 400px;
-        }
         
         .board {
             position: absolute;
-            width: 400px;
-            height: 400px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
+            aspect-ratio: 1/1;
+            
         }
         
         .refresh-btn {
@@ -99,6 +78,44 @@
         
         .refresh-btn:hover {
             background: #555;
+        }
+        
+        .sync-btn {
+            position: fixed;
+            top: 20px;
+            right: 80px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .sync-btn:hover {
+            background: #555;
+        }
+        
+        .sync-btn.paused {
+            background: #666;
+            opacity: 0.7;
+        }
+        
+        .sync-btn.paused .material-icons {
+            animation: none;
+        }
+        
+        .sync-btn:not(.paused) .material-icons {
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         .status {
@@ -123,6 +140,10 @@
         <span class="material-icons">refresh</span>
     </button>
     
+    <button class="sync-btn" id="syncBtn" onclick="toggleSync()">
+        <span class="material-icons">sync</span>
+    </button>
+    
     <div class="status" id="status">Loading sessions...</div>
     
     <div class="grid" id="grid">
@@ -139,6 +160,8 @@
         window.isWideMode = false;
         
         let sessions = [];
+        let syncInterval = null;
+        let isSyncActive = true;
         let boardConfigs = [
             { 
                 letter: 'A',
@@ -299,12 +322,49 @@
             }
         }
         
-        // Load sessions immediately and then every 10 seconds
-        loadSessions();
-        setInterval(loadSessions, 10000);
+        // Function to toggle sync
+        function toggleSync() {
+            const syncBtn = document.getElementById('syncBtn');
+            isSyncActive = !isSyncActive;
+            
+            if (isSyncActive) {
+                // Start sync
+                syncBtn.classList.remove('paused');
+                syncBtn.querySelector('.material-icons').textContent = 'sync';
+                startSync();
+                document.getElementById('status').textContent = 'Auto-sync enabled';
+            } else {
+                // Pause sync
+                syncBtn.classList.add('paused');
+                syncBtn.querySelector('.material-icons').textContent = 'pause';
+                stopSync();
+                document.getElementById('status').textContent = 'Auto-sync paused';
+            }
+        }
         
-        // Make loadSessions available globally for the refresh button
+        // Function to start sync
+        function startSync() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+            }
+            syncInterval = setInterval(loadSessions, 10000);
+        }
+        
+        // Function to stop sync
+        function stopSync() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+                syncInterval = null;
+            }
+        }
+        
+        // Load sessions immediately and start sync
+        loadSessions();
+        startSync();
+        
+        // Make functions available globally
         window.loadSessions = loadSessions;
+        window.toggleSync = toggleSync;
     </script>
 </body>
 </html> 
