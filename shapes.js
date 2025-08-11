@@ -41,8 +41,8 @@ function drawShape(canvas, shape, color) {
                 // For narrow mode, draw a half-circle (ellipse) that spans the width
                 const centerX = width *.85;
                 const centerY = height * .5;
-                const radiusX = height * 0.35; // Use height for horizontal radius (after rotation)
-                const radiusY = width * 0.7; // Use width for vertical radius (after rotation)
+                const radiusX = height * 0.5; // Use height for horizontal radius (after rotation)
+                const radiusY = width * 0.25; // Use width for vertical radius (after rotation)
                 
                 // Draw a half ellipse rotated 90 degrees (right half)
                 ctx.beginPath();
@@ -175,16 +175,19 @@ function drawShape(canvas, shape, color) {
             // Center circle
             const circleDiameter = width * 0.187;
             ctx.beginPath();
-            ctx.ellipse(
-                width / 2,
-                height / 2,
-                isNarrow ?  circleDiameter : circleDiameter/2,
-                circleDiameter / 2,
-                0, // rotation
-                0,
-                Math.PI * 2
-            );
+            if (!isNarrow) {
+                ctx.ellipse(
+                    width / 2,
+                    height / 2,
+                    isNarrow ?  circleDiameter : circleDiameter/2,
+                    circleDiameter / 2,
+                    0, // rotation
+                    0,
+                    Math.PI * 2
+                );
             ctx.fill();
+
+            }
             break;
         }
         

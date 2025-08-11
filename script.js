@@ -1,7 +1,7 @@
 import './styles.css'
 import './boards.css'
 
-const logSession = true;
+const logSession = false;
 
 document.addEventListener('DOMContentLoaded', function() {
     const boardsContainer = document.querySelector('.boards-container');
@@ -218,13 +218,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
                 // Based on case 0 in the Objective-C code
-                const stripeHeight = height * 0.09;
-                const spacing = height * 0.09;
+                const stripeHeight = isNarrow ? height * 0.09 : height * 0.09;
+                const spacing = isNarrow ? height * 0.09 : height * 0.09;
                 const stripeWidth =  isWide ? width * 0.9 : width * 0.8;
-                const startY = height * 0.725;
+                const startY = isNarrow ? height * 0.635 : height * 0.725;
                 
-
-                for (let i = 0; i < 4; i++) {
+                let stripeNum = isNarrow? 3:4;
+                for (let i = 0; i < stripeNum; i++) {
                     ctx.fillRect(
                         isWide ? width * 0.05 : width * 0.1,
                         startY - i * (stripeHeight + spacing),
@@ -257,27 +257,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isNarrow) {
                     // For narrow mode, draw a half-circle (ellipse) that spans the width
                     const centerX = width * .5;
-                    const centerY = height * .5;
-                    const radiusX = height * 0.15; // Use height for horizontal radius (after rotation)
-                    const radiusY = width * 0.3; // Use width for vertical radius (after rotation)
-                    const barWidth = width * 0.09; 
-                    const barHalfWidth = barWidth / 2;
+                    const radiusX = height * 0.12; // Use height for horizontal radius (after rotation)
+                    const radiusY = width * 0.24; // Use width for vertical radius (after rotation)
+                    // const barWidth = width * 0.09; 
+                    // const barHalfWidth = barWidth / 2;
                     // Draw the top half of the circle
                     ctx.beginPath();
-                    ctx.ellipse(centerX, centerY, radiusX, radiusY, Math.PI/2, 0, Math.PI * 2, false);
+                    ctx.ellipse(centerX, width * .76, radiusX, radiusY, Math.PI/2, 0, Math.PI * 2, false);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.ellipse(centerX, width * .24, radiusX, radiusY, Math.PI/2, 0, Math.PI * 2, false);
                     ctx.fill();
                     // Now cut out the middle bar by drawing with destination-out
-                    ctx.globalCompositeOperation = 'source-over';
+                    // ctx.globalCompositeOperation = 'source-over';
                     
-                    ctx.fillRect(
-                        centerX - radiusY,
-                        centerY - barHalfWidth,
-                        radiusY * 2,
-                        barWidth
-                    );
+                    // ctx.fillRect(
+                    //     centerX - radiusY,
+                    //     centerY - barHalfWidth,
+                    //     radiusY * 2,
+                    //     barWidth
+                    // );
                     
-                    // Reset composite operation
-                    ctx.globalCompositeOperation = 'destination-out';
+                    // // Reset composite operation
+                    // ctx.globalCompositeOperation = 'destination-out';
 
                 } else if (isWide) {
                       // For narrow mode, draw a half-circle (ellipse) that spans the width
@@ -359,11 +361,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
                 if (isNarrow) {
-                    const circleDiameter = width * 0.187;
+                    const circleDiameter = width * 0.24;
                     ctx.beginPath();
                     ctx.ellipse(
                         width / 2,
-                        height * 0.75,
+                        height * 0.76,
                         circleDiameter,
                         circleDiameter / 2,
                         0, // rotation
@@ -372,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     );
                     ctx.ellipse(
                         width / 2,
-                        height * 0.25,
+                        height * 0.24,
                         circleDiameter,
                         circleDiameter / 2,
                         0, // rotation
@@ -436,11 +438,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
                 // Based on case 3 in the Objective-C code
-                const size = isNarrow ? width * 0.48 : (isWide ? width * 0.7 : width * 0.57);
-                const x = (width - size) / 2;
-                const y = (height - size) / 2;
+                const sizex = isNarrow ? width * 0.8 : (isWide ? width * 0.7 : width * 0.57);
+                const sizey = isNarrow ? width * 0.45 : (isWide ? width * 0.7 : width * 0.57);
+                const x = (width - sizex) / 2;
+                const y = (height - sizey) / 2;
                 
-                ctx.fillRect(x, y, size, size);
+                ctx.fillRect(x, y, sizex, sizey);
                 break;
             }
             
@@ -505,7 +508,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
                 
                 // Center circle
-                ctx.beginPath();
+                if (!isNarrow) {
+                    ctx.beginPath();
                 ctx.ellipse(
                     width / 2,
                     height / 2,
@@ -516,6 +520,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     Math.PI * 2
                 );
                 ctx.fill();
+                }
+                
                 break;
             }
             
@@ -536,27 +542,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
                 const insetX = isNarrow ? width * 0.04 : (isWide ? width * 0.3 : width * 0.06);
-                const insetY = isNarrow ? height * 0.24 : (isWide ? height * 0.2 : height * 0.21);
-                const gap = isNarrow ? width * 0.5 : (isWide ? width * 0.1 : width * 0.19);
+                const insetY = isNarrow ? height * 0.275 : (isWide ? height * 0.2 : height * 0.21);
+                const triangleWidth = isNarrow ? width * 0.49 : (isWide ? width * 0.1 : width * 0.19);
                 const midX = width / 2;
                 const midY = height / 2;
                 // Increase the gap between triangles
-                const triangleOffset = isNarrow ? width * 0.1 : (isWide ? width * 0.02 : width * 0.03);
+                const triangleOffset = isNarrow ? width * 0.05 : (isWide ? width * 0.02 : width * 0.03);
                 
                 if (isNarrow) {
                     // Top triangle
                     ctx.beginPath();
                     ctx.moveTo(midX, insetY);
-                    ctx.lineTo(midX - gap / 2, midY - triangleOffset);
-                    ctx.lineTo(midX + gap / 2, midY - triangleOffset);
+                    ctx.lineTo(midX - triangleWidth / 2, midY - triangleOffset);
+                    ctx.lineTo(midX + triangleWidth / 2, midY - triangleOffset);
                     ctx.closePath();
                     ctx.fill();
 
                     // Bottom triangle
                     ctx.beginPath();
                     ctx.moveTo(midX, height - insetY);
-                    ctx.lineTo(midX - gap / 2, midY + triangleOffset);
-                    ctx.lineTo(midX + gap / 2, midY + triangleOffset);
+                    ctx.lineTo(midX - triangleWidth / 2, midY + triangleOffset);
+                    ctx.lineTo(midX + triangleWidth / 2, midY + triangleOffset);
                     ctx.closePath();
                     ctx.fill();
                 } else if (isWide) {
@@ -564,30 +570,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     ctx.beginPath();
                     ctx.moveTo(insetX, midY);
-                    ctx.lineTo(midX - gap / 2, insetY);
-                    ctx.lineTo(midX - gap / 2, height - insetY);
+                    ctx.lineTo(midX - triangleWidth / 2, insetY);
+                    ctx.lineTo(midX - triangleWidth / 2, height - insetY);
                     ctx.closePath();
                     ctx.fill();
 
                     ctx.beginPath();
                     ctx.moveTo(width - insetX, midY);
-                    ctx.lineTo(midX + gap / 2, insetY);
-                    ctx.lineTo(midX + gap / 2, height - insetY);
+                    ctx.lineTo(midX + triangleWidth / 2, insetY);
+                    ctx.lineTo(midX + triangleWidth / 2, height - insetY);
                     ctx.closePath();
                     ctx.fill();
 
                     const diamondWidth = width * 0.15;
                     ctx.beginPath();
                     ctx.moveTo(width - insetX + diamondWidth, midY);
-                    ctx.lineTo(midX + gap / 2 + diamondWidth, insetY);
-                    ctx.lineTo(midX + gap / 2 + diamondWidth, height - insetY);
+                    ctx.lineTo(midX + triangleWidth / 2 + diamondWidth, insetY);
+                    ctx.lineTo(midX + triangleWidth / 2 + diamondWidth, height - insetY);
                     ctx.closePath();
                     ctx.fill();
                     
                     ctx.beginPath();
                     ctx.moveTo(insetX -diamondWidth, midY);
-                    ctx.lineTo(midX - gap / 2 -diamondWidth, insetY);
-                    ctx.lineTo(midX - gap / 2 - diamondWidth, height - insetY);
+                    ctx.lineTo(midX - triangleWidth / 2 -diamondWidth, insetY);
+                    ctx.lineTo(midX - triangleWidth / 2 - diamondWidth, height - insetY);
                     ctx.closePath();
                     ctx.fill();
                     
@@ -597,16 +603,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Left triangle - regular mode
                     ctx.beginPath();
                     ctx.moveTo(insetX, midY);
-                    ctx.lineTo(midX - gap / 2, insetY);
-                    ctx.lineTo(midX - gap / 2, height - insetY);
+                    ctx.lineTo(midX - triangleWidth / 2, insetY);
+                    ctx.lineTo(midX - triangleWidth / 2, height - insetY);
                     ctx.closePath();
                     ctx.fill();
 
                     // Right triangle - regular mode
                     ctx.beginPath();
                     ctx.moveTo(width - insetX, midY);
-                    ctx.lineTo(midX + gap / 2, insetY);
-                    ctx.lineTo(midX + gap / 2, height - insetY);
+                    ctx.lineTo(midX + triangleWidth / 2, insetY);
+                    ctx.lineTo(midX + triangleWidth / 2, height - insetY);
                     ctx.closePath();
                     ctx.fill();
                 }
@@ -1646,17 +1652,18 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeBoards();
     updateDownloadButtonColor();
     
-    // Download button click handler (placeholder for now)
+    // Download button click handler
     const downloadBtn = document.getElementById('downloadBtn');
     if (downloadBtn) {
         downloadBtn.addEventListener('click', function() {
-            // For now, just add a subtle animation
+            // Add a subtle animation
             this.style.animation = 'none';
             setTimeout(() => {
                 this.style.animation = 'button-pulse 0.5s ease';
             }, 5);
             
-            console.log('Download button clicked - functionality will be implemented later');
+            // Open Google Drive folder in a new window
+            window.open('https://drive.google.com/drive/folders/1ODYMgVLqkLpn-dvruK8gxDZsmjRrkY3I?usp=drive_link', '_blank');
         });
     }
 
