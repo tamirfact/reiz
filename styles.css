@@ -1,5 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 
+/* Prevent zoom and touch gestures */
+html {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent double-tap zoom on iOS */
+* {
+    touch-action: manipulation;
+}
+
 :root {
     /* Dark mode colors (default) */
     --color-background: #242323;
@@ -344,7 +366,7 @@ body.light-mode .theme-toggle .moon-icon {
         --gap: 12px;
         --font-size-cal: 16px;
         --ctrl-button-size: 40px;
-        --ctrl-button-gap: 8px;
+        --ctrl-button-gap: 12px;
         --cal-radius: 6px;
         --shiver-intensity: 0.75;
     }
@@ -459,19 +481,25 @@ body.light-mode .theme-toggle .moon-icon {
 
 /* Mobile styles */
 @media (max-width: 700px) {
+
+    .container {
+        max-height: auto;
+        min-height: auto;
+        height: 100%;
+    }
     .drawer {
         left: 0;
         bottom: -100%;
         top: auto;
         width: 100%;
         height: auto;
-        max-height: 80vh;
+        height: 100vh;
         transform: translateY(0);
     }
 
     .drawer.open {
         bottom: 0px;
-        height: 70vh;
+        height: 100vh;
     }
 
     .drawer .description {

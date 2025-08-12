@@ -9,9 +9,8 @@ export default defineConfig({
     assetsDir: 'assets',
     rollupOptions: {
       input: {
-        main: 'index.html',
-        watch: 'watch.html'
-      },
+        main: 'index.html'
+        },
       output: {
         assetFileNames: 'assets/[name]-[hash][extname]',
         chunkFileNames: 'assets/[name]-[hash].js',

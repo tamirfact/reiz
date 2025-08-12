@@ -4,6 +4,25 @@ import './boards.css'
 const logSession = false;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Hide all elements with .hide-on-mobile if on mobile device (using user agent and touch support)
+    function isMobileDevice() {
+        return (
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+            (typeof window.orientation !== "undefined") ||
+            (navigator.maxTouchPoints && navigator.maxTouchPoints > 1)
+        );
+    }
+
+    if (isMobileDevice()) {
+        document.querySelectorAll('.hide-on-mobile').forEach(el => {
+            el.style.display = 'none';
+        });
+    }
+
+
+
+
+
     const boardsContainer = document.querySelector('.boards-container');
     const controlsContainer = document.querySelector('.controls');
     const baseWidth = 800;
@@ -728,94 +747,15 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('dragging');
             
             // Add mousemove and mouseup listeners
-            document.addEventListener('mousemove', handleDrag);
-            document.addEventListener('mouseup', handleDragEnd);
+            // document.addEventListener('mousemove', handleDrag);
+            // document.addEventListener('mouseup', handleDragEnd);
         });
         
-        function handleDrag(e) {
-            // if (!boardContainer.classList.contains('dragging')) return;
-            
-            // const deltaX = e.clientX - startX;
-            // const deltaY = e.clientY - startY;
-            // const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            
-            // // Apply transform
-            // boardContainer.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            
-            // // Change color to gray if dragged beyond 200px
-            // if (distance > 200) {
-            //     const canvas = boardContainer.querySelector('canvas');
-            //     if (canvas) {
-            //         drawShape(canvas, config.shape, '#666666');
-            //     }
-            // } else {
-            //     // Restore original color
-            //     const canvas = boardContainer.querySelector('canvas');
-            //     if (canvas) {
-            //         const color = getColorForBoard(boards[parseInt(boardContainer.dataset.index)]);
-            //         drawShape(canvas, config.shape, color);
-            //     }
-            // }
-        }
-        
-        function handleDragEnd(e) {
-            // if (!boardContainer.classList.contains('dragging')) return;
-            
-            // const deltaX = e.clientX - startX;
-            // const deltaY = e.clientY - startY;
-            // const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            // const dragDuration = Date.now() - dragStartTime;
-            
-            // // Remove dragging class
-            // boardContainer.classList.remove('dragging');
-            
-            // // Remove event listeners
-            // document.removeEventListener('mousemove', handleDrag);
-            // document.removeEventListener('mouseup', handleDragEnd);
-            
-            // if (distance > 200) {
-            //     // If dragged more than 100px, make the board disappear
-            //     const controlBtn = controlsContainer.querySelector(`.control-btn[data-board-index="${i}"]`);
-            //     if (controlBtn) {
-            //         // Click the control button until the board is hidden
-            //         const clickUntilHidden = () => {
-            //             if (boardContainer.style.display !== 'none') {
-            //                 controlBtn.click();
-            //                 setTimeout(clickUntilHidden, 50); // Small delay between clicks
-            //                 setTimeout(() => {
-            //                     gsap.to(boardContainer, {
-            //                         x: 0,
-            //                         y: 0,
-            //                         duration: 0.3,
-            //                         ease: "elastic.out(1, 0.7)"
-            //                     });
-            //                 }, 100);
-            //             }
-            //         };
-            //         clickUntilHidden();
-            //     }
-            // } else {
-            //     // Snap back to original position
-            //     gsap.to(boardContainer, {
-            //         x: 0,
-            //         y: 0,
-            //         duration: 0.3,
-            //         ease: "elastic.out(1, 0.7)"
-            //     });
-            // }
-        }
         
         // Add click event listener to the board container
         boardContainer.addEventListener('click', function(e) {
-            // Only trigger if the board is visible and it's a quick click (not a drag)
-            if (this.style.display !== 'none' && Date.now() - dragStartTime < 200) {
-                // Find the corresponding control button
-                const controlBtn = controlsContainer.querySelector(`.control-btn[data-board-index="${i}"]`);
-                if (controlBtn) {
-                    // Trigger the control button's click event
-                    controlBtn.click();
-                }
-            }
+
+            refreshBoards();
         });
         
         boardsContainer.appendChild(boardContainer);
@@ -1368,174 +1308,178 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add refresh button functionality
     const refreshBtn = document.querySelector('.refresh-btn');
     
+
+    function refreshBoards() {
+   // Add rotation animation class
+   refreshBtn.classList.add('rotating');
+        
+   // Apply a 3D effect to the calendar
+   const calendar = document.querySelector('.calendar');
+   
+   // Check if we're on a mobile device
+   if (isMobileDevice()) {
+       // MOBILE VERSION - Simplified animation
+       const tl = gsap.timeline();
+       
+       // First half - slide up and fade out
+       tl.to(calendar, {
+           translateY: -20,
+           opacity: 0.8,
+           duration: 0.3,
+           ease: "power1.in",
+           onStart: function() {
+               calendar.classList.add('showing-back');
+           }
+       })
+       // Swap boards at the midpoint
+       .call(() => {
+           // Reinitialize all boards immediately
+           initializeBoards();
+           
+           // Update download button color after boards are reinitialized
+           updateDownloadButtonColor();
+       })
+       // Second half - slide down and fade in
+       .to(calendar, {
+           translateY: 0,
+           opacity: 1,
+           duration: 0.3,
+           ease: "power1.out",
+           delay: 0.1, // Small delay to ensure boards are initialized
+           onComplete: function() {
+               calendar.classList.remove('showing-back');
+               
+               // Reset any transform properties that might have accumulated
+               gsap.set(calendar, { 
+                   clearProps: "transform,filter,boxShadow" 
+               });
+           }
+       })
+       // Small bounce effect
+       .to(calendar, {
+           scale: 1.02,
+           duration: 0.1,
+           ease: "power2.out"
+       })
+       .to(calendar, {
+           scale: 1,
+           duration: 0.1,
+           ease: "power2.in",
+           onComplete: function() {
+               // Remove the rotation class after animation completes
+               refreshBtn.classList.remove('rotating');
+           }
+       });
+   } else {
+       // DESKTOP VERSION - Full 3D rotation
+       const tl = gsap.timeline();
+       
+       // First half of the rotation (0 to 180 degrees)
+       tl.to(calendar, {
+           rotateY: 180,
+           scale: 0.9, // Scale down during flip
+           duration: 0.5,  // Half duration
+           ease: "power1.inOut",
+           onUpdate: function() {
+               // Get current rotation
+               const rotation = gsap.getProperty(calendar, "rotateY");
+               
+               // Enhanced 3D effect with shadow and lighting based on rotation
+               const shadowBlur = Math.abs(Math.sin(rotation * Math.PI / 180)) * 25;
+               const brightness = 1 - Math.abs(Math.sin(rotation * Math.PI / 180)) * 0.2;
+               
+               calendar.style.boxShadow = `0px ${shadowBlur}px ${shadowBlur * 1.5}px rgba(0, 0, 0, 0.2)`;
+               calendar.style.filter = `brightness(${brightness})`;
+               
+               // Add or remove a class to indicate the back side is showing
+               if (rotation > 90 && rotation < 270) {
+                   calendar.classList.add('showing-back');
+                   // Hide boards container immediately when showing back
+                   boardsContainer.style.visibility = 'hidden';
+                   boardsContainer.style.opacity = '0';
+               } else {
+                   calendar.classList.remove('showing-back');
+                   // Show boards container when not showing back
+                   boardsContainer.style.visibility = 'visible';
+                   boardsContainer.style.opacity = '1';
+               }
+               
+               // At the midpoint of the animation (around 180 degrees), swap the boards
+               if (rotation > 170 && rotation < 190 && !tl.hasSwappedBoards) {
+                   tl.hasSwappedBoards = true;
+                   // Small delay before reinitializing the boards
+                   setTimeout(() => {
+                       // Reinitialize all boards when the calendar is flipped
+                       initializeBoards();
+                   }, 50);
+               }
+           }
+       })
+       // Second half of the rotation (180 to 360/0 degrees)
+       .to(calendar, {
+           rotateY: 360,
+           scale: 1, // Return to original scale
+           duration: 0.5,  // Half duration
+           ease: "power1.inOut",
+           onUpdate: function() {
+               // Get current rotation
+               const rotation = gsap.getProperty(calendar, "rotateY");
+               
+               // Enhanced 3D effect with shadow and lighting based on rotation
+               const shadowBlur = Math.abs(Math.sin(rotation * Math.PI / 180)) * 25;
+               const brightness = 1 - Math.abs(Math.sin(rotation * Math.PI / 180)) * 0.2;
+               
+               calendar.style.boxShadow = `0px ${shadowBlur}px ${shadowBlur * 1.5}px rgba(0, 0, 0, 0.2)`;
+               calendar.style.filter = `brightness(${brightness})`;
+               
+               // Add or remove a class to indicate the back side is showing
+               if (rotation > 90 && rotation < 270) {
+                   calendar.classList.add('showing-back');
+                   // Hide boards container immediately when showing back
+                   boardsContainer.style.visibility = 'hidden';
+                   boardsContainer.style.opacity = '0';
+               } else {
+                   calendar.classList.remove('showing-back');
+                   // Show boards container when not showing back
+                   boardsContainer.style.visibility = 'visible';
+                   boardsContainer.style.opacity = '1';
+               }
+           },
+           onComplete: function() {
+               // Reset the rotation to 0 to avoid accumulating rotations
+               gsap.set(calendar, { rotateY: 0 });
+               // Reset any added styles
+               updateDownloadButtonColor();
+               calendar.style.boxShadow = '';
+               calendar.style.filter = '';
+               calendar.classList.remove('showing-back'); // Ensure the class is removed
+               // Ensure boards are fully visible at the end
+               boardsContainer.style.visibility = 'visible';
+               boardsContainer.style.opacity = '1';
+           }
+       })
+       // Add a bounce effect at the end
+       .to(calendar, {
+           scale: 1.03,
+           duration: 0.2,
+           ease: "power2.out"
+       })
+       .to(calendar, {
+           scale: 1,
+           duration: 0.15,
+           ease: "power2.in",
+           onComplete: function() {
+               // Remove the rotation class after animation completes
+               refreshBtn.classList.remove('rotating');
+           }
+       });
+       
+       // Reset the flag for the next animation
+       tl.hasSwappedBoards = false;
+   }
+    }
     refreshBtn.addEventListener('click', function() {
-        // Add rotation animation class
-        this.classList.add('rotating');
-        
-        // Apply a 3D effect to the calendar
-        const calendar = document.querySelector('.calendar');
-        
-        // Check if we're on a mobile device
-        if (isMobileDevice()) {
-            // MOBILE VERSION - Simplified animation
-            const tl = gsap.timeline();
-            
-            // First half - slide up and fade out
-            tl.to(calendar, {
-                translateY: -20,
-                opacity: 0.8,
-                duration: 0.3,
-                ease: "power1.in",
-                onStart: function() {
-                    calendar.classList.add('showing-back');
-                }
-            })
-            // Swap boards at the midpoint
-            .call(() => {
-                // Reinitialize all boards immediately
-                initializeBoards();
-                
-                // Update download button color after boards are reinitialized
-                updateDownloadButtonColor();
-            })
-            // Second half - slide down and fade in
-            .to(calendar, {
-                translateY: 0,
-                opacity: 1,
-                duration: 0.3,
-                ease: "power1.out",
-                delay: 0.1, // Small delay to ensure boards are initialized
-                onComplete: function() {
-                    calendar.classList.remove('showing-back');
-                    
-                    // Reset any transform properties that might have accumulated
-                    gsap.set(calendar, { 
-                        clearProps: "transform,filter,boxShadow" 
-                    });
-                }
-            })
-            // Small bounce effect
-            .to(calendar, {
-                scale: 1.02,
-                duration: 0.1,
-                ease: "power2.out"
-            })
-            .to(calendar, {
-                scale: 1,
-                duration: 0.1,
-                ease: "power2.in",
-                onComplete: function() {
-                    // Remove the rotation class after animation completes
-                    refreshBtn.classList.remove('rotating');
-                }
-            });
-        } else {
-            // DESKTOP VERSION - Full 3D rotation
-            const tl = gsap.timeline();
-            
-            // First half of the rotation (0 to 180 degrees)
-            tl.to(calendar, {
-                rotateY: 180,
-                scale: 0.9, // Scale down during flip
-                duration: 0.5,  // Half duration
-                ease: "power1.inOut",
-                onUpdate: function() {
-                    // Get current rotation
-                    const rotation = gsap.getProperty(calendar, "rotateY");
-                    
-                    // Enhanced 3D effect with shadow and lighting based on rotation
-                    const shadowBlur = Math.abs(Math.sin(rotation * Math.PI / 180)) * 25;
-                    const brightness = 1 - Math.abs(Math.sin(rotation * Math.PI / 180)) * 0.2;
-                    
-                    calendar.style.boxShadow = `0px ${shadowBlur}px ${shadowBlur * 1.5}px rgba(0, 0, 0, 0.2)`;
-                    calendar.style.filter = `brightness(${brightness})`;
-                    
-                    // Add or remove a class to indicate the back side is showing
-                    if (rotation > 90 && rotation < 270) {
-                        calendar.classList.add('showing-back');
-                        // Hide boards container immediately when showing back
-                        boardsContainer.style.visibility = 'hidden';
-                        boardsContainer.style.opacity = '0';
-                    } else {
-                        calendar.classList.remove('showing-back');
-                        // Show boards container when not showing back
-                        boardsContainer.style.visibility = 'visible';
-                        boardsContainer.style.opacity = '1';
-                    }
-                    
-                    // At the midpoint of the animation (around 180 degrees), swap the boards
-                    if (rotation > 170 && rotation < 190 && !tl.hasSwappedBoards) {
-                        tl.hasSwappedBoards = true;
-                        // Small delay before reinitializing the boards
-                        setTimeout(() => {
-                            // Reinitialize all boards when the calendar is flipped
-                            initializeBoards();
-                        }, 50);
-                    }
-                }
-            })
-            // Second half of the rotation (180 to 360/0 degrees)
-            .to(calendar, {
-                rotateY: 360,
-                scale: 1, // Return to original scale
-                duration: 0.5,  // Half duration
-                ease: "power1.inOut",
-                onUpdate: function() {
-                    // Get current rotation
-                    const rotation = gsap.getProperty(calendar, "rotateY");
-                    
-                    // Enhanced 3D effect with shadow and lighting based on rotation
-                    const shadowBlur = Math.abs(Math.sin(rotation * Math.PI / 180)) * 25;
-                    const brightness = 1 - Math.abs(Math.sin(rotation * Math.PI / 180)) * 0.2;
-                    
-                    calendar.style.boxShadow = `0px ${shadowBlur}px ${shadowBlur * 1.5}px rgba(0, 0, 0, 0.2)`;
-                    calendar.style.filter = `brightness(${brightness})`;
-                    
-                    // Add or remove a class to indicate the back side is showing
-                    if (rotation > 90 && rotation < 270) {
-                        calendar.classList.add('showing-back');
-                        // Hide boards container immediately when showing back
-                        boardsContainer.style.visibility = 'hidden';
-                        boardsContainer.style.opacity = '0';
-                    } else {
-                        calendar.classList.remove('showing-back');
-                        // Show boards container when not showing back
-                        boardsContainer.style.visibility = 'visible';
-                        boardsContainer.style.opacity = '1';
-                    }
-                },
-                onComplete: function() {
-                    // Reset the rotation to 0 to avoid accumulating rotations
-                    gsap.set(calendar, { rotateY: 0 });
-                    // Reset any added styles
-                    updateDownloadButtonColor();
-                    calendar.style.boxShadow = '';
-                    calendar.style.filter = '';
-                    calendar.classList.remove('showing-back'); // Ensure the class is removed
-                    // Ensure boards are fully visible at the end
-                    boardsContainer.style.visibility = 'visible';
-                    boardsContainer.style.opacity = '1';
-                }
-            })
-            // Add a bounce effect at the end
-            .to(calendar, {
-                scale: 1.03,
-                duration: 0.2,
-                ease: "power2.out"
-            })
-            .to(calendar, {
-                scale: 1,
-                duration: 0.15,
-                ease: "power2.in",
-                onComplete: function() {
-                    // Remove the rotation class after animation completes
-                    refreshBtn.classList.remove('rotating');
-                }
-            });
-            
-            // Reset the flag for the next animation
-            tl.hasSwappedBoards = false;
-        }
+        refreshBoards();
     });
     
     // Theme toggle functionality
