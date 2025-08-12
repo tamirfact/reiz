@@ -5,7 +5,7 @@ export default defineConfig({
   publicDir: 'public',
   base: './', // Changed from '/reiz/' to './' for relative paths
   build: {
-    outDir: 'dist',
+    outDir: 'docs',
     assetsDir: 'assets',
     rollupOptions: {
       input: {
