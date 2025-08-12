@@ -1,0 +1,93 @@
+<!-- TODO: add link to reizinger site -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reisinger's Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script type="module" crossorigin src="./assets/index-CMoLxgiQ.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DqMO4QnX.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="display: flex; align-items: center; gap: 6px; cursor: pointer;"><span class="material-icons">more_vert</span>Perpetual Calendar</h1>
+            <div class="drawer">
+                <button class="close-drawer" aria-label="Close drawer">
+                    <span class="material-icons">close</span>
+                </button>
+                <p class="description">
+                    PERPETUAL CALENDAR<br><br>
+
+                    In 1987, MoMA commissioned Dan Reisinger to create a prepetual calendar. Reisinger has creared a vibrant and interactive calendar that empowered users to form up to 46,080 visually appealing combinations of color and form. The original design consisted of a durable metal frame holding six double-sided, colored cutout sheets and date cards. This digital interactive version builds upon Reisinger's concept, offering new ways to engage with his work that were unavailable in the original physical format.<br><br>
+                    Original design by <a href="https://danreisinger.com/">Dan Reisinger</a>.<br><br>
+                    Digitized by <a href="https://nadavbarkan.com/">Nadav Barkan</a> and <a href="https://www.tamirp.com/">Tamir Pomerantz</a>.
+                </p>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="calendar-container">
+
+                <div class="controls-section">
+           
+                
+                    <div class="controls">
+                        <!-- Control buttons will be dynamically created with JavaScript -->
+                    </div>
+                </div>
+
+
+                <div class="calendar initial-state">
+                    <div class="top-hole hide-on-drag"></div>
+                    <div class="top-square hide-on-drag"></div>
+                    <div class="boards-container">
+                        <!-- Boards will be dynamically created with JavaScript -->
+                    </div>
+                    <div class="calendar-footer">
+                        <div class="day-label">TUE</div>
+                        <div class="month-label">FEB</div>
+                        <div class="date-label">3</div>
+                    </div>
+                </div>
+                <div class="plaheholder" style="width: 60px"></div>
+            </div>
+            
+           
+        </div>
+        
+        <div class="footer-left">
+
+            <button class="refresh-btn" title="Shuffle boards">
+                <span class="material-icons">refresh</span>
+            </button>
+            
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">
+                <span class="material-icons moon-icon">dark_mode</span>
+                <span class="material-icons sun-icon">light_mode</span>
+            </button>
+            
+            <button class="resize-toggle" id="resizeToggle" aria-label="Toggle board size">
+                <span class="material-icons">aspect_ratio</span>
+            </button>
+           
+            <button class="download-btn" id="downloadBtn" aria-label="Download calendar">
+                <span class="material-icons">download</span>
+                <span class="btn-text">Download Screensaver</span>
+            </button>
+
+          
+
+        </div>
+        <p class="footer-right">Designed by Dan Reisinger</p>
+        
+       
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+</body>
+</html>
