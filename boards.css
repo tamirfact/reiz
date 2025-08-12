@@ -11,7 +11,7 @@
     gap: 24px;
 }
 
-@media (max-width: 700px) {
+@media (orientation: portrait) and (max-width: 700px) {
     .calendar-container {
         flex-direction: column-reverse;
         align-items: center;
@@ -216,7 +216,7 @@ body.wide-mode .boards-container {
     pointer-events: none; /* Ensure it doesn't interfere with clicking */
 }
 
-@media (max-width: 700px) {
+@media (orientation: portrait) and (max-width: 700px) {
     .control-btn:hover::before {
         content: "";
     
@@ -244,7 +244,7 @@ body.light-mode .control-btn:hover:not(.shiver-1):not(.shiver-2):not(.shiver-3):
 }
 
 /* Desktop hover effect with border and glow */
-@media (min-width: 701px) and (min-height: 551px) {
+@media (orientation: portrait) and (min-width: 701px) and (min-height: 551px) {
     .control-btn:hover:not(.sortable-chosen):not(.sortable-drag):not(.sortable-ghost) {
         border: 1px solid rgba(255, 255, 255, 0.8);
         box-shadow: 0 0 8px rgba(255, 255, 255, 0.4), 0 0 16px rgba(255, 255, 255, 0.2);
@@ -283,7 +283,7 @@ body.light-mode .control-btn:hover:not(.shiver-1):not(.shiver-2):not(.shiver-3):
 }
 
 /* Desktop hover effect for canvas brightness */
-@media (min-width: 701px) and (min-height: 551px) {
+@media (orientation: portrait) and (min-width: 701px) and (min-height: 551px) {
     .control-btn:hover:not(.sortable-chosen):not(.sortable-drag):not(.sortable-ghost) canvas {
         filter: brightness(1.15);
     }
@@ -602,7 +602,7 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
 }
 
 /* Media query for mobile in narrow mode needs adjustments */
-@media (max-width: 700px) {
+@media (orientation: portrait) and (max-width: 700px) {
     body.narrow-mode .calendar {
         width: calc((var(--cal-size) / 2) + 20px);
         padding: 10px;
@@ -641,7 +641,7 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
 }
 
 /* Responsive design */
-@media (max-width: 700px) {
+@media (orientation: portrait) and (max-width: 700px) {
 
     .main-content {
         flex-direction: column;
@@ -770,7 +770,7 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
 }
 
 /* Media query adjustments for wide mode */
-@media (max-width: 700px) {
+@media (orientation: portrait) and (max-width: 700px) {
     body.wide-mode .calendar {
         width: calc((var(--cal-size) * 2) + 20px);
         padding: 10px;
@@ -799,3 +799,31 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
     100% { transform:  scale(1); }
 }
 
+@media (orientation: landscape) and (max-height: 500px) {
+    * {
+        --ctrl-button-gap: 0px;
+        --cal-size: 50dvh;
+    }
+    .calendar-container {
+        align-items: center;
+    }
+    .container {
+        padding: 8px;
+    }
+    .calendar {
+        padding: 8px;
+        width: calc(var(--cal-size) + 16px);
+    }
+    body.narrow-mode .calendar {
+        width: calc(var(--cal-size) / 2 + 16px);
+    }
+    body.wide-mode .calendar {
+        width: calc(var(--cal-size) * 2 + 16px);
+    }
+    .boards-container {
+        margin-bottom: 8px;
+    }
+    .calendar-footer {
+        gap: 8px;
+    }
+}
