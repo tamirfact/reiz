@@ -543,7 +543,7 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
 
 /* Add a subtle glow effect to the active board during drag */
 .board-container.active-drag {
-    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    /* box-shadow: 0 0 20px rgba(255,255,255,0.2); */
 }
 
 /* Add this to your CSS file */

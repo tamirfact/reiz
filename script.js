@@ -970,19 +970,33 @@ document.addEventListener('DOMContentLoaded', function() {
             delete window.currentDragDirection;
         },
         onChange: function(evt) {
-            // Get current order during drag
-            const currentOrder = Array.from(controlsContainer.children).map(
+        
+            // Get the current order from DOM
+            let currentOrder = Array.from(controlsContainer.children).map(
                 control => parseInt(control.dataset.boardIndex)
             );
+            // On mobile, remove the last one in the array
+           
+            if (isMobileDevice()) {
+                currentOrder.pop();
+            }
+
+            // INSERT_YOUR_CODE
+            // Print currentOrder on the DOM for debugging
+            let orderDisplay = document.getElementById('currentOrderDisplay');
+  
+            orderDisplay.textContent = 'Order: ' + currentOrder.join(', ');
+            
             
             // Determine drag direction
             const newIndex = evt.newIndex;
             const oldIndex = evt.oldIndex;
+            
             window.currentDragDirection = newIndex > oldIndex ? 1 : -1;
             
             // Animate boards to their new positions based on current order
             animateBoardsToNewOrder(currentOrder);
-                
+           
                 // Update shiver animations for non-dragged items
                 updateShiverAnimations();
         }
@@ -1195,6 +1209,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add active-drag class for visual emphasis
                 board.container.classList.add('active-drag');
                 
+                // Update z-index immediately for mobile compatibility
+                board.container.style.zIndex = visualPosition;
+                
                 // Animate to new position
                 gsap.to(board.container, {
                     z: zPosition,
@@ -1204,6 +1221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     duration: BOARD_ANIMATION_DURATION,
                     ease: "power1.out"
                 });
+              
             }
         });
     }
