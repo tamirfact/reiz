@@ -490,16 +490,18 @@ body.light-mode .theme-toggle .moon-icon {
     .drawer {
         left: 0;
         bottom: -100%;
+        opacity: 0;
         top: auto;
         width: 100%;
         height: auto;
-        height: 100vh;
+        height: 100dvh;
         transform: translateY(0);
     }
 
     .drawer.open {
         bottom: 0px;
-        height: 100vh;
+        height: 100dvh;
+        opacity: 1;
     }
 
     .drawer .description {
