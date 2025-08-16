@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (isWide) {
                     // Wide mode - For now, using regular mode settings with adjustments
                     const slotWidth = width * 0.9;
-                    const slotHeight = width * 0.2;
+                    const slotHeight = width * 0.27;
                     const x = (width - slotWidth) / 2;
                     const y = (height - slotHeight) / 2;
                     const radius = slotHeight / 2;
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Based on case 3 in the Objective-C code
                 const sizex = isNarrow ? width * 0.8 : (isWide ? width * 0.7 : width * 0.57);
-                const sizey = isNarrow ? width * 0.45 : (isWide ? width * 0.7 : width * 0.57);
+                const sizey = isNarrow ? width * 0.45 : (isWide ? width * 0.63 : width * 0.57);
                 const x = (width - sizex) / 2;
                 const y = (height - sizey) / 2;
                 
@@ -713,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
         boardContainer.appendChild(canvas);
         
         // Randomly determine initial state (0: primary, 1: secondary, 2: off)
-        const initialState = Math.floor(Math.random() * 3);
+        const initialState = Math.floor(Math.random() * 2); // 0 or 1 - show all boards
         let initialColor;
         
         if (initialState === 0) {
