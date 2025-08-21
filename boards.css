@@ -380,7 +380,7 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--gap);
+    /* gap: var(--gap); */
     z-index: 100;
 }
 
@@ -803,6 +803,7 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
     * {
         --ctrl-button-gap: 0px;
         --cal-size: 50dvh;
+        /* background:red; */
     }
     .calendar-container {
         align-items: center;
@@ -826,4 +827,11 @@ body.narrow-mode .day-label::before, body.narrow-mode .month-label::before, body
     .calendar-footer {
         gap: 8px;
     }
+    .refresh-btn {
+        display: none !important;
+    }
+    .refresh-btn.mobile-refresh-btn {
+        display: flex !important;
+    }
+   
 }

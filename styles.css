@@ -152,8 +152,28 @@ body {
 }
 
 /* Theme toggle button */
-.theme-toggle,
 .resize-toggle {
+    background: color-mix(in srgb, #fff 12%, transparent 88%);
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    z-index: 1000;
+    /* width: 32px; */
+    height: 32px;
+    border-radius: 24px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    animation-fill-mode: forwards;
+}
+
+body.light-mode .resize-toggle {
+    background: color-mix(in srgb, #000 7%, transparent 93%);
+}
+
+.theme-toggle {
     background: transparent;
     border: none;
     color: var(--color-text);
@@ -166,17 +186,71 @@ body {
     align-items: center;
     justify-content: center;
     transition: background-color 0.3s ease, transform 0.3s ease;
-    animation-fill-mode: forwards;
+    animation-fill-mode: forwards;  
 }
 
-/* Resize toggle icon rotation */
-body.narrow-mode .resize-toggle .material-icons {
-    /* transform: rotate(90deg); */
-}
+/* Resize toggle icon visibility - all icons visible, selected one is white
+.resize-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    z-index: 1000;
+    width: 80px;
+    height: 32px;
+    border-radius: 16px;
+    transition: background-color 0.3s ease;
+} */
 
 .resize-toggle .material-icons {
-    transform: rotate(0deg);
-    transition: transform 0.3s ease;
+    transition: color 0.3s ease, opacity 0.3s ease;
+    font-size: 16px;
+    opacity: 0.4;
+    color: var(--color-text);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: color 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.resize-toggle .material-icons:hover {
+    background-color: color-mix(in srgb, var(--color-text-primary) 7%, transparent 93%);
+    opacity: 0.7;
+}
+
+/* Default state - standard icon is white */
+.resize-toggle .standard-icon {
+    opacity: 1;
+    color: var(--color-text);
+}
+
+/* Narrow mode - narrow icon is white */
+body.narrow-mode .resize-toggle .narrow-icon {
+    opacity: 1;
+    color: var(--color-text);
+}
+
+body.narrow-mode .resize-toggle .standard-icon,
+body.narrow-mode .resize-toggle .wide-icon {
+    opacity: 0.4;
+    color: var(--color-text);
+}
+
+/* Wide mode - wide icon is white */
+body.wide-mode .resize-toggle .wide-icon {
+    opacity: 1;
+    color: var(--color-text);
+}
+
+body.wide-mode .resize-toggle .standard-icon,
+body.wide-mode .resize-toggle .narrow-icon {
+    opacity: 0.4;
+    color: var(--color-text);
 }
 
 .theme-toggle .material-icons,
@@ -184,32 +258,18 @@ body.narrow-mode .resize-toggle .material-icons {
    font-size: 18px;
 }
 
-.theme-toggle:hover,
+/* .theme-toggle:hover,
 .resize-toggle:hover {
     background-color: color-mix(in srgb, var(--color-text-primary) 7%, transparent 93%);
     transform: scale(1.05);
-}
-
+} */
+/* 
 .theme-toggle:active,
 .resize-toggle:active {
     transform: scale(0.95);
-}
+} */
 
-/* Resize toggle animations */
-@keyframes resize-toggle-to-narrow {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(90deg); }
-}
-
-@keyframes resize-toggle-to-wide {
-    0% { transform: rotate(90deg); }
-    100% { transform: rotate(180deg); }
-}
-
-@keyframes resize-toggle-to-standard {
-    0% { transform: rotate(180deg); }
-    100% { transform: rotate(0deg); }
-}
+/* Resize toggle animations removed - now using icon switching */
 
 /* Show/hide appropriate icon based on current theme */
 .theme-toggle .sun-icon {
@@ -228,13 +288,15 @@ body.light-mode .theme-toggle .moon-icon {
     display: none;
 }
 
-/* Refresh button styles */
-.refresh-container {
+/* Controls section styles */
+.controls-section {
     display: flex;
-    justify-content: center;
-    margin-top: 5px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
+/* Refresh button styles */
 .refresh-btn {
     width: 32px;
     height: 32px;
@@ -247,6 +309,27 @@ body.light-mode .theme-toggle .moon-icon {
     align-items: center;
     color: var(--color-text-primary);
     transition: all 0.3s ease;
+}
+
+/* Mobile refresh button - hidden by default, shown on mobile */
+.mobile-refresh-btn {
+    display: none;
+}
+
+/* Desktop refresh button - shown by default, hidden on mobile */
+.controls-section .refresh-btn {
+    display: flex;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .mobile-refresh-btn {
+        display: flex;
+    }
+    
+    .controls-section .refresh-btn {
+        display: none;
+    }
 }
 
 .refresh-btn:hover {
@@ -394,6 +477,9 @@ body.light-mode .theme-toggle .moon-icon {
 
     .download-btn {
        display: none;
+    }
+    .wide-icon {
+        display: none;
     }
     
   

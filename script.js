@@ -114,16 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
         boardMode = 2;
     }
     
-    // Initialize the resize-toggle icon rotation based on current mode
-    const resizeToggleBtn = document.getElementById('resizeToggle');
-    if (resizeToggleBtn) {
-        const iconElement = resizeToggleBtn.querySelector('.material-icons');
-        if (boardMode === 1) { // narrow mode
-            iconElement.style.transform = 'rotate(90deg)';
-        } else if (boardMode === 2) { // wide mode
-            iconElement.style.transform = 'rotate(180deg)';
-        }
-    }
+    // Initialize the resize-toggle icon visibility based on current mode
+    // This is now handled by CSS based on body classes
     
     // Define board colors and shapes based on the Objective-C code
     const boardConfigs = [
@@ -1518,86 +1510,70 @@ document.addEventListener('DOMContentLoaded', function() {
     // Resize toggle functionality
     const resizeToggle = document.getElementById('resizeToggle');
     
-    // Toggle between square, narrow, and wide board layouts
-    resizeToggle.addEventListener('click', function() {
-        // Check if we're on mobile and prevent wide mode
-        const isMobile = window.innerWidth < 600;
-        
-        // Increment the board mode (0: standard, 1: narrow, 2: wide)
-        // On mobile, only toggle between standard (0) and narrow (1)
-        if (isMobile && boardMode === 1) {
-            boardMode = 0; // Skip wide mode on mobile
-        } else {
-            boardMode = (boardMode + 1) % 3;
-        }
-        
-        // Update body classes based on the new mode
-        document.body.classList.remove('narrow-mode', 'wide-mode');
-        if (boardMode === 1) {
-            document.body.classList.add('narrow-mode');
-        } else if (boardMode === 2) {
-            document.body.classList.add('wide-mode');
-        }
-        
-        // Reset animation first
-        this.style.animation = 'none';
-        
-        // Get the icon element
-        const iconElement = this.querySelector('.material-icons');
-        
-        // Update the toggle button rotation based on current mode
-        setTimeout(() => {
-            if (boardMode === 1) {
-                // Animate to 90 degrees if switching to narrow mode
-                this.style.animation = 'resize-toggle-to-narrow 0.5s ease forwards';
-                iconElement.style.transform = 'rotate(90deg)';
-            } else if (boardMode === 2) {
-                // Animate to 180 degrees if switching to wide mode
-                this.style.animation = 'resize-toggle-to-wide 0.5s ease forwards';
-                iconElement.style.transform = 'rotate(180deg)';
-            } else {
-                // Animate to 0 degrees if switching to standard mode
-                this.style.animation = 'resize-toggle-to-standard 0.5s ease forwards';
-                iconElement.style.transform = 'rotate(0deg)';
-            }
-        }, 5);
-        
-        // Update control button sizes and redraw shapes
-        const controlBtns = controlsContainer.querySelectorAll('.control-btn');
-        controlBtns.forEach(btn => {
-            // Remove all size classes
-            btn.classList.remove('narrow', 'regular', 'wide');
+    // Handle individual icon clicks for board layout switching
+    const resizeToggleIcons = resizeToggle.querySelectorAll('.material-icons');
+    resizeToggleIcons.forEach(icon => {
+        icon.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent event bubbling
             
-            // Add appropriate size class
-            if (boardMode === 1) {
-                btn.classList.add('narrow');
-            } else if (boardMode === 2) {
-                btn.classList.add('wide');
-            } else {
-                btn.classList.add('regular');
+            const targetMode = parseInt(this.dataset.mode);
+            
+            // Check if we're on mobile and prevent wide mode
+            const isMobile = window.innerWidth < 600;
+            if (isMobile && targetMode === 2) {
+                return; // Don't allow wide mode on mobile
             }
             
-            // Get the canvas and redraw the shape
-            const canvas = btn.querySelector('canvas');
-            if (canvas) {
-                const boardIndex = parseInt(btn.dataset.boardIndex);
-                const board = boards[boardIndex];
-                console.log(board);
-                const color = getColorForBoard(board);
-                drawShape(canvas, board.config.shape, color);
+            // Set the board mode directly
+            boardMode = targetMode;
+            
+            // Update body classes based on the new mode
+            document.body.classList.remove('narrow-mode', 'wide-mode');
+            if (boardMode === 1) {
+                document.body.classList.add('narrow-mode');
+            } else if (boardMode === 2) {
+                document.body.classList.add('wide-mode');
             }
+            
+            // The icon switching is now handled by CSS based on body classes
+            
+            // Update control button sizes and redraw shapes
+            const controlBtns = controlsContainer.querySelectorAll('.control-btn');
+            controlBtns.forEach(btn => {
+                // Remove all size classes
+                btn.classList.remove('narrow', 'regular', 'wide');
+                
+                // Add appropriate size class
+                if (boardMode === 1) {
+                    btn.classList.add('narrow');
+                } else if (boardMode === 2) {
+                    btn.classList.add('wide');
+                } else {
+                    btn.classList.add('regular');
+                }
+                
+                // Get the canvas and redraw the shape
+                const canvas = btn.querySelector('canvas');
+                if (canvas) {
+                    const boardIndex = parseInt(btn.dataset.boardIndex);
+                    const board = boards[boardIndex];
+                    console.log(board);
+                    const color = getColorForBoard(board);
+                    drawShape(canvas, board.config.shape, color);
+                }
+            });
+            
+            // Redraw all visible boards with new aspect ratio
+            boards.forEach(board => {
+                if (board.container.style.display !== 'none') {
+                    const color = getColorForBoard(board);
+                    drawShape(board.canvas, board.config.shape, color);
+                }
+            });
+            
+            // Update download button color after layout change
+            updateDownloadButtonColor();
         });
-        
-        // Redraw all visible boards with new aspect ratio
-        boards.forEach(board => {
-            if (board.container.style.display !== 'none') {
-                const color = getColorForBoard(board);
-                drawShape(board.canvas, board.config.shape, color);
-            }
-        });
-        
-        // Update download button color after layout change
-        updateDownloadButtonColor();
     });
     // Helper function to get the current color for a board
     function getColorForBoard(board) {
