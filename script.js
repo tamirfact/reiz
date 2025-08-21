@@ -1316,12 +1316,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add refresh button functionality
-    const refreshBtn = document.querySelector('.refresh-btn');
+    const refreshBtns = document.querySelectorAll('.refresh-btn');
     
 
     function refreshBoards() {
-   // Add rotation animation class
-   refreshBtn.classList.add('rotating');
+   // Add rotation animation class to all refresh buttons
+   refreshBtns.forEach(btn => btn.classList.add('rotating'));
         
    // Apply a 3D effect to the calendar
    const calendar = document.querySelector('.calendar');
@@ -1377,7 +1377,7 @@ document.addEventListener('DOMContentLoaded', function() {
            ease: "power2.in",
            onComplete: function() {
                // Remove the rotation class after animation completes
-               refreshBtn.classList.remove('rotating');
+               refreshBtns.forEach(btn => btn.classList.remove('rotating'));
            }
        });
    } else {
@@ -1480,7 +1480,7 @@ document.addEventListener('DOMContentLoaded', function() {
            ease: "power2.in",
            onComplete: function() {
                // Remove the rotation class after animation completes
-               refreshBtn.classList.remove('rotating');
+               refreshBtns.forEach(btn => btn.classList.remove('rotating'));
            }
        });
        
@@ -1488,8 +1488,11 @@ document.addEventListener('DOMContentLoaded', function() {
        tl.hasSwappedBoards = false;
    }
     }
-    refreshBtn.addEventListener('click', function() {
-        refreshBoards();
+    // Add event listeners to all refresh buttons
+    refreshBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            refreshBoards();
+        });
     });
     
     // Theme toggle functionality

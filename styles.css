@@ -228,7 +228,9 @@ body.light-mode .resize-toggle {
     opacity: 1;
     color: var(--color-text);
 }
-
+.narrow-icon {
+    transform: rotate(90deg);
+}
 /* Narrow mode - narrow icon is white */
 body.narrow-mode .resize-toggle .narrow-icon {
     opacity: 1;
